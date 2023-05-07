@@ -14,25 +14,25 @@
 <a href="https://github.com/karfly/chatgpt_telegram_bot/blob/main/static/donate/donate.md#%EF%B8%8F-donate" alt="Donate shield"><img src="https://img.shields.io/badge/-Donate-red?logo=undertale" width="100"/></a>
 </p>
 
-We all love [chat.openai.com](https://chat.openai.com), but... It's TERRIBLY laggy, has daily limits, and is only accessible through an archaic web interface.
+Мы все любим [chat.openai.com](https://chat.openai.com), но... Это ужасно тормозит, имеет дневные лимиты и доступно только через архаичный веб-интерфейс.
+Этот репозиторий - пересоздание ChatGPT в качестве Telegram-бота. **И он работает отлично.**
 
-This repo is ChatGPT re-created as Telegram Bot. **And it works great.**
+You can deploy your own bot, or use mine: [@ChatHPTVKLTD_bot](https://t.me/ChatGPTVKLTD_bot)
 
-You can deploy your own bot, or use mine: [@chatgpt_karfly_bot](https://t.me/chatgpt_karfly_bot)
+## Особенности
+- Ответы с низкой задержкой (обычно занимает около 3-5 секунд)
+- Нет ограничений на запросы
+- Потоковая передача сообщений (смотрите демонстрацию)
+- Поддержка GPT-4
+- Поддержка группового чата (/help_group_chat для получения инструкций)
+- DALLE 2 (выберите режим 👩‍🎨 Художник, чтобы генерировать изображения)
+- Распознавание голосовых сообщений
+- Подсветка кода
+- 15 специальных режимов чата: 👩🏼‍🎓 Ассистент, 👩🏼‍💻 Ассистент по коду, 👩‍🎨 Художник, 🧠 Психолог, 🚀 Илон Маск и другие. Вы можете легко создавать свои собственные режимы чата, редактируя `config/chat_modes.yml`
+- Поддержка [ChatGPT API](https://platform.openai.com/docs/guides/chat/introduction)
+- Список разрешенных пользователей Telegram
+- Отслеживание баланса $, потраченного на OpenAI API
 
-## Features
-- Low latency replies (it usually takes about 3-5 seconds)
-- No request limits
-- Message streaming (watch demo)
-- GPT-4 support
-- Group Chat support (/help_group_chat to get instructions)
-- DALLE 2 (choose 👩‍🎨 Artist mode to generate images)
-- Voice message recognition
-- Code highlighting
-- 15 special chat modes: 👩🏼‍🎓 Assistant, 👩🏼‍💻 Code Assistant, 👩‍🎨 Artist, 🧠 Psychologist, 🚀 Elon Musk and other. You can easily create your own chat modes by editing `config/chat_modes.yml`
-- Support of [ChatGPT API](https://platform.openai.com/docs/guides/chat/introduction)
-- List of allowed Telegram users
-- Track $ balance spent on OpenAI API
 
 <p align="center">
   <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmM2ZWVjY2M4NWQ3ZThkYmQ3MDhmMTEzZGUwOGFmOThlMDIzZGM4YiZjdD1n/unx907h7GSiLAugzVX/giphy.gif" />
@@ -41,7 +41,7 @@ You can deploy your own bot, or use mine: [@chatgpt_karfly_bot](https://t.me/cha
 ---
 
 ## 🤑 Payments
-[My bot](https://t.me/chatgpt_karfly_bot) supports many payments providers:
+[Мой бот](https://t.me/ChatGPTVKLTD_bot) поддерживает несколько провайдеров для оплаты:
 - 💎 Crypto
 - [Stripe](https://stripe.com)
 - [Smart Glocal](https://smart-glocal.com)
@@ -49,7 +49,7 @@ You can deploy your own bot, or use mine: [@chatgpt_karfly_bot](https://t.me/cha
 - [ЮMoney](https://yoomoney.ru)
 - and [many-many other](https://core.telegram.org/bots/payments#supported-payment-providers)
 
-If you want to add payments to your bot and create profitable business – write me on Telegram ([@karfly](https://t.me/karfly)).
+If you want to add payments to your bot and create profitable business – write me on Telegram ([@vkltd](https://t.me/vkltd)).
 
 ## News
 - *21 Apr 2023*:

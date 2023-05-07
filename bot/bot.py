@@ -1,3 +1,5 @@
+# docker-compose --env-file config/config.env up --build
+
 import os
 import logging
 import asyncio
@@ -9,7 +11,6 @@ import pydub
 from pathlib import Path
 from datetime import datetime
 import openai
-
 
 import telegram
 from telegram import (
@@ -408,7 +409,7 @@ async def new_dialog_handle(update: Update, context: CallbackContext):
     db.set_user_attribute(user_id, "last_interaction", datetime.now())
 
     db.start_new_dialog(user_id)
-    await update.message.reply_text("Starting new dialog ✅")
+    await update.message.reply_text("Начинаем новый диалог ✅")
 
     chat_mode = db.get_user_attribute(user_id, "current_chat_mode")
     await update.message.reply_text(f"{config.chat_modes[chat_mode]['welcome_message']}", parse_mode=ParseMode.HTML)
