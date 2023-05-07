@@ -14,8 +14,10 @@
 <a href="https://github.com/karfly/chatgpt_telegram_bot/blob/main/static/donate/donate.md#%EF%B8%8F-donate" alt="Donate shield"><img src="https://img.shields.io/badge/-Donate-red?logo=undertale" width="100"/></a>
 </p>
 
-Мы все любим [chat.openai.com](https://chat.openai.com), но... Это ужасно тормозит, имеет дневные лимиты и доступно только через архаичный веб-интерфейс.
-Этот репозиторий - пересоздание ChatGPT в качестве Telegram-бота. **И он работает отлично.**
+Мы все любим [chat.openai.com](https://chat.openai.com), но... Он ужасно тормозит, имеет дневные лимиты и доступно только через архаичный веб-интерфейс.
+Этот репозиторий - пересоздание ChatGPT в качестве Telegram-бота.
+
+**И он работает отлично.**
 
 You can deploy your own bot, or use mine: [@ChatHPTVKLTD_bot](https://t.me/ChatGPTVKLTD_bot)
 
@@ -47,44 +49,45 @@ You can deploy your own bot, or use mine: [@ChatHPTVKLTD_bot](https://t.me/ChatG
 - [Smart Glocal](https://smart-glocal.com)
 - [Unlimint](https://www.unlimint.com)
 - [ЮMoney](https://yoomoney.ru)
-- and [many-many other](https://core.telegram.org/bots/payments#supported-payment-providers)
+- и [несколько других](https://core.telegram.org/bots/payments#supported-payment-providers)
 
-If you want to add payments to your bot and create profitable business – write me on Telegram ([@vkltd](https://t.me/vkltd)).
 
-## News
-- *21 Apr 2023*:
-    - DALLE 2 support
-    - Group Chat support (/help_group_chat to get instructions)
-    - 10 new hot chat modes and updated chat mode menu with pagination: 🇬🇧 English Tutor, 🧠 Psychologist, 🚀 Elon Musk, 📊 SQL Assistant and other.
-- *24 Mar 2023*: GPT-4 support. Run `/settings` command to choose model
-- *15 Mar 2023*: Added message streaming. Now you don't have to wait until the whole message is ready, it's streamed to Telegram part-by-part (watch demo)
-- *9 Mar 2023*: Now you can easily create your own Chat Modes by editing `config/chat_modes.yml`
-- *8 Mar 2023*: Added voice message recognition with [OpenAI Whisper API](https://openai.com/blog/introducing-chatgpt-and-whisper-apis). Record a voice message and ChatGPT will answer you!
-- *2 Mar 2023*: Added support of [ChatGPT API](https://platform.openai.com/docs/guides/chat/introduction). It's enabled by default and can be disabled with `use_chatgpt_api` option in config. Don't forget to **rebuild** you docker image (`--build`).
+## Новости
+- *21 апреля 2023*:
+    - Поддержка DALLE 2
+    - Поддержка группового чата (/help_group_chat для получения инструкций)
+    - 10 новых режимов чата и обновленное меню режимов чата с пагинацией: 🇬🇧 Английский репетитор, 🧠 Психолог, 🚀 Илон Маск, 📊 Ассистент SQL и другие.
+- *24 марта 2023*: Поддержка GPT-4. Запустите команду `/settings`, чтобы выбрать модель.
+- *15 марта 2023*: Добавлена потоковая передача сообщений. Теперь вам не нужно ждать, пока сообщение полностью готово, оно передается в Telegram частями (смотрите демонстрацию).
+- *9 марта 2023*: Теперь вы можете легко создавать свои собственные режимы чата, редактируя `config/chat_modes.yml`.
+- *8 марта 2023*: Добавлено распознавание голосовых сообщений с помощью [OpenAI Whisper API](https://openai.com/blog/introducing-chatgpt-and-whisper-apis). Запишите голосовое сообщение, и ChatGPT ответит вам!
+- *2 марта 2023*: Добавлена поддержка [ChatGPT API](https://platform.openai.com/docs/guides/chat/introduction). Он включен по умолчанию и может быть отключен с помощью опции `use_chatgpt_api` в конфигурации. Не забудьте **пересобрать** ваш образ Docker (`--build`).
 
-## Bot commands
-- `/retry` – Regenerate last bot answer
-- `/new` – Start new dialog
-- `/mode` – Select chat mode
-- `/balance` – Show balance
-- `/settings` – Show settings
-- `/help` – Show help
 
-## Setup
-1. Get your [OpenAI API](https://openai.com/api/) key
+## Команды бота
+- `/retry` – Повторно сгенерировать последний ответ бота
+- `/new` – Начать новый диалог
+- `/mode` – Выбрать режим чата
+- `/balance` – Показать баланс
+- `/settings` – Показать настройки
+- `/help` – Показать справку
 
-2. Get your Telegram bot token from [@BotFather](https://t.me/BotFather)
+## Установка
+1. Получите свой ключ [OpenAI API](https://openai.com/api/)
 
-3. Edit `config/config.example.yml` to set your tokens and run 2 commands below (*if you're advanced user, you can also edit* `config/config.example.env`):
+2. Получите токен вашего Telegram-бота от [@BotFather](https://t.me/BotFather)
+
+3. Отредактируйте `config/config.example.yml`, чтобы установить свои токены, и запустите 2 команды ниже (*если вы опытный пользователь, вы также можете отредактировать* `config/config.example.env`):
     ```bash
     mv config/config.example.yml config/config.yml
     mv config/config.example.env config/config.env
     ```
 
-4. 🔥 And now **run**:
+4. 🔥 И теперь **запустите**:
     ```bash
     docker-compose --env-file config/config.env up --build
     ```
+   
 
 ## ❤️ Top donations
 You can be in this list: <a href="https://github.com/karfly/chatgpt_telegram_bot/blob/main/static/donate/donate.md#%EF%B8%8F-donate" alt="Donate shield"><img src="https://img.shields.io/badge/-Donate-red?logo=undertale" /></a>
