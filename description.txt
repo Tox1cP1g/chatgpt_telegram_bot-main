@@ -1,0 +1,8 @@
+
+
+create mongo user:
+
+db.createUser({ user: "vkltd", pwd: "piskogryz", roles: [{ role: "readWrite", db: "chatgpt_telegram_bot"} ] })
+
+db.changeUserPassword("vkltd", 'piskogryz')
+
