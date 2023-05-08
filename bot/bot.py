@@ -134,6 +134,7 @@ async def is_bot_mentioned(update: Update, context: CallbackContext):
 
 
 async def start_handle(update: Update, context: CallbackContext):
+    print("зашли в старт")
     await register_user_if_not_exists(update, context, update.message.from_user)
     user_id = update.message.from_user.id
 
@@ -627,6 +628,7 @@ async def edited_message_handle(update: Update, context: CallbackContext):
 
 
 async def error_handle(update: Update, context: CallbackContext) -> None:
+    print("ошибка")
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
     try:
@@ -661,7 +663,9 @@ async def post_init(application: Application):
         BotCommand("/help", "Show help message"),
     ])
 
+
 def run_bot() -> None:
+    print("залупа 0")
     application = (
         ApplicationBuilder()
         .token(config.telegram_token)
@@ -670,6 +674,8 @@ def run_bot() -> None:
         .post_init(post_init)
         .build()
     )
+
+    print("залупа 1")
 
     # add handlers
     user_filter = filters.ALL
@@ -699,6 +705,8 @@ def run_bot() -> None:
     application.add_handler(CommandHandler("balance", show_balance_handle, filters=user_filter))
 
     application.add_error_handler(error_handle)
+
+    print("залупа запущена!!")
 
     # start the bot
     application.run_polling()
