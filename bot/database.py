@@ -14,6 +14,7 @@ class Database:
 
         self.user_collection = self.db["user"]
         self.dialog_collection = self.db["dialog"]
+        self.invoices_collection = self.db['invoices']
 
     def check_if_user_exists(self, user_id: int, raise_exception: bool = False):
         if self.user_collection.count_documents({"_id": user_id}) > 0:
@@ -126,3 +127,13 @@ class Database:
             {"_id": dialog_id, "user_id": user_id},
             {"$set": {"messages": dialog_messages}}
         )
+
+    def create_invoice(self, user_id: int):
+        invoice_uuid = uuid.uuid4().hex
+        self.invoices_collection.insert_one({
+            "_id": invoice_uuid,
+
+        })
+
+    def get_invoice(self, user_id: int):
+        pass
