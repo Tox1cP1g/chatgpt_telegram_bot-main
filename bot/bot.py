@@ -313,7 +313,7 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
         try:
             await task
         except asyncio.CancelledError:
-            await update.message.reply_text("✅ Canceled", parse_mode=ParseMode.HTML)
+            await update.message.reply_text("✅ Отменено", parse_mode=ParseMode.HTML)
         else:
             pass
         finally:
@@ -432,7 +432,7 @@ async def cancel_handle(update: Update, context: CallbackContext):
 
 def get_chat_mode_menu(page_index: int):
     n_chat_modes_per_page = config.n_chat_modes_per_page
-    text = f"Select <b>chat mode</b> ({len(config.chat_modes)} modes available):"
+    text = f"Выберите <b>режим чата</b> ({len(config.chat_modes)} режимов доступно):"
 
     # buttons
     chat_mode_keys = list(config.chat_modes.keys())
