@@ -12,6 +12,7 @@ from pathlib import Path
 from datetime import datetime
 import openai
 
+
 import telegram
 from telegram import (
     Update,
@@ -52,7 +53,7 @@ HELP_MESSAGE = """Команды:
 ⚪ /balance – Показать баланс
 ⚪ /help – Показать панель помощи
 
-🎨 Создание изображений из текстовых подсказок в <b>👩‍🎨 Artist</b> /mode
+🎨 Создание изображений из текстовых подсказок в <b>👩‍🎨Художник</b> /mode
 👥 Добавить бота в <b>групповой чат</b>: /help_group_chat
 🎤 Ты можешь отправлять <b>голосовые сообщения</b> вместо текста
 """
@@ -64,8 +65,8 @@ HELP_GROUP_CHAT_MESSAGE = """Ты можешь добавить бота в лю
 2. Выдай ему роль <b>администратора</b>, чтобы он мог видеть сообщения (остальные права могут быть ограничены)
 3. Победа!
 
-To get a reply from the bot in the chat – @ <b>tag</b> it or <b>reply</b> to its message.
-For example: "{bot_username} write a poem about Telegram"
+Чтобы получить ответ от бота в чате –  отметьте его @<b>tag</b> или <b>ответьте</b> на его сообщение.
+Например: "{bot_username} напишет стихотворение о Telegram"
 """
 
 
@@ -215,7 +216,7 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
         if use_new_dialog_timeout:
             if (datetime.now() - db.get_user_attribute(user_id, "last_interaction")).seconds > config.new_dialog_timeout and len(db.get_dialog_messages(user_id)) > 0:
                 db.start_new_dialog(user_id)
-                await update.message.reply_text(f"Starting new dialog due to timeout (<b>{config.chat_modes[chat_mode]['name']}</b> mode) ✅", parse_mode=ParseMode.HTML)
+                await update.message.reply_text(f"Начало нового диалога из-за тайм-аута (<b>{config.chat_modes[chat_mode]['name']}</b> mode) ✅", parse_mode=ParseMode.HTML)
         db.set_user_attribute(user_id, "last_interaction", datetime.now())
 
         # in case of CancelledError
@@ -655,7 +656,7 @@ async def error_handle(update: Update, context: CallbackContext) -> None:
 
 async def post_init(application: Application):
     await application.bot.set_my_commands([
-        BotCommand("/new", "Start new dialog"),
+        BotCommand("/new", "Начать новый диалог"),
         BotCommand("/mode", "Select chat mode"),
         BotCommand("/retry", "Re-generate response for previous query"),
         BotCommand("/balance", "Show balance"),
