@@ -19,7 +19,7 @@
 
 **И он работает отлично.**
 
-You can deploy your own bot, or use mine: [@ChatGPTVKLTD_bot](https://t.me/ChatGPTVKLTD_bot)
+Вы можете создать своего бота или использовать готовый: [@ChatGPTVKLTD_bot](https://t.me/ChatGPTVKLTD_bot)
 
 ## Особенности
 - Ответы с низкой задержкой (обычно занимает около 3-5 секунд)
