@@ -55,6 +55,7 @@ HELP_MESSAGE = """Команды:
 ⚪ /mode – Выбрать режим чата
 ⚪ /settings – Показать настройки
 ⚪ /balance – Показать баланс
+⚪ /pay – Пополнить баланс
 ⚪ /help – Показать панель помощи
 
 🎨 Создание изображений из текстовых подсказок в <b>👩‍🎨Художник</b> /mode
@@ -682,9 +683,9 @@ async def post_init(application: Application):
         BotCommand("/mode", "Select chat mode"),
         BotCommand("/retry", "Re-generate response for previous query"),
         BotCommand("/balance", "Show balance"),
+        BotCommand("/pay", "Replenish the balance"),
         BotCommand("/settings", "Show settings"),
         BotCommand("/help", "Show help message"),
-        BotCommand("/shipping", "Create payment invoice"),
     ])
 
 
