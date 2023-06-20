@@ -3,17 +3,19 @@
 import os
 import logging
 import asyncio
-import traceback
 import html
 import json
 import tempfile
 import pydub
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 import openai
+import traceback
 
 
 import telegram
+from telegram import LabeledPrice, ShippingOption, Update
+
 from telegram import (
     Update,
     User,
@@ -29,7 +31,9 @@ from telegram.ext import (
     MessageHandler,
     CallbackQueryHandler,
     AIORateLimiter,
-    filters
+    filters,
+    ContextTypes,
+    PreCheckoutQueryHandler
 )
 from telegram.constants import ParseMode, ChatAction
 
@@ -195,6 +199,10 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
         await edited_message_handle(update, context)
         return
 
+    if db.get_remaining_calls(update.message.from_user.id) <= 0:
+        await update.message.reply_text('У вас на счету 0 вызовов 🥲\nВы можете купить вызовы командой /pay')
+        return
+
     _message = message or update.message.text
 
     # remove bot mention (in group chats)
@@ -312,6 +320,8 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
 
         try:
             await task
+            db.update_user_calls(update.message.from_user.id)
+
         except asyncio.CancelledError:
             await update.message.reply_text("✅ Отменено", parse_mode=ParseMode.HTML)
         else:
@@ -582,42 +592,46 @@ async def show_balance_handle(update: Update, context: CallbackContext):
     db.set_user_attribute(user_id, "last_interaction", datetime.now())
 
     # count total usage statistics
-    total_n_spent_dollars = 0
-    total_n_used_tokens = 0
+    # total_n_spent_dollars = 0
+    # total_n_used_tokens = 0
+    #
+    # n_used_tokens_dict = db.get_user_attribute(user_id, "n_used_tokens")
+    # n_generated_images = db.get_user_attribute(user_id, "n_generated_images")
+    # n_transcribed_seconds = db.get_user_attribute(user_id, "n_transcribed_seconds")
 
-    n_used_tokens_dict = db.get_user_attribute(user_id, "n_used_tokens")
-    n_generated_images = db.get_user_attribute(user_id, "n_generated_images")
-    n_transcribed_seconds = db.get_user_attribute(user_id, "n_transcribed_seconds")
+    used_calls = db.get_user_attribute(user_id, "current_calls")
+    exists_calls = db.get_user_attribute(user_id, "remaining_calls")
+    #
+    # details_text = "🏷️ Details:\n"
+    # for model_key in sorted(n_used_tokens_dict.keys()):
+    #     n_input_tokens, n_output_tokens = n_used_tokens_dict[model_key]["n_input_tokens"], n_used_tokens_dict[model_key]["n_output_tokens"]
+    #     total_n_used_tokens += n_input_tokens + n_output_tokens
+    #
+    #     n_input_spent_dollars = config.models["info"][model_key]["price_per_1000_input_tokens"] * (n_input_tokens / 1000)
+    #     n_output_spent_dollars = config.models["info"][model_key]["price_per_1000_output_tokens"] * (n_output_tokens / 1000)
+    #     total_n_spent_dollars += n_input_spent_dollars + n_output_spent_dollars
+    #
+    #     details_text += f"- {model_key}: <b>{n_input_spent_dollars + n_output_spent_dollars:.03f}$</b> / <b>{n_input_tokens + n_output_tokens} tokens</b>\n"
+    #
+    # # image generation
+    # image_generation_n_spent_dollars = config.models["info"]["dalle-2"]["price_per_1_image"] * n_generated_images
+    # if n_generated_images != 0:
+    #     details_text += f"- DALL·E 2 (image generation): <b>{image_generation_n_spent_dollars:.03f}$</b> / <b>{n_generated_images} generated images</b>\n"
+    #
+    # total_n_spent_dollars += image_generation_n_spent_dollars
+    #
+    # # voice recognition
+    # voice_recognition_n_spent_dollars = config.models["info"]["whisper"]["price_per_1_min"] * (n_transcribed_seconds / 60)
+    # if n_transcribed_seconds != 0:
+    #     details_text += f"- Whisper (voice recognition): <b>{voice_recognition_n_spent_dollars:.03f}$</b> / <b>{n_transcribed_seconds:.01f} seconds</b>\n"
+    #
+    # total_n_spent_dollars += voice_recognition_n_spent_dollars
+    #
+    # text = f"You spent <b>{total_n_spent_dollars:.03f}$</b>\n"
+    # text += f"You used <b>{total_n_used_tokens}</b> tokens\n\n"
+    # text += details_text
 
-    details_text = "🏷️ Details:\n"
-    for model_key in sorted(n_used_tokens_dict.keys()):
-        n_input_tokens, n_output_tokens = n_used_tokens_dict[model_key]["n_input_tokens"], n_used_tokens_dict[model_key]["n_output_tokens"]
-        total_n_used_tokens += n_input_tokens + n_output_tokens
-
-        n_input_spent_dollars = config.models["info"][model_key]["price_per_1000_input_tokens"] * (n_input_tokens / 1000)
-        n_output_spent_dollars = config.models["info"][model_key]["price_per_1000_output_tokens"] * (n_output_tokens / 1000)
-        total_n_spent_dollars += n_input_spent_dollars + n_output_spent_dollars
-
-        details_text += f"- {model_key}: <b>{n_input_spent_dollars + n_output_spent_dollars:.03f}$</b> / <b>{n_input_tokens + n_output_tokens} tokens</b>\n"
-
-    # image generation
-    image_generation_n_spent_dollars = config.models["info"]["dalle-2"]["price_per_1_image"] * n_generated_images
-    if n_generated_images != 0:
-        details_text += f"- DALL·E 2 (image generation): <b>{image_generation_n_spent_dollars:.03f}$</b> / <b>{n_generated_images} generated images</b>\n"
-
-    total_n_spent_dollars += image_generation_n_spent_dollars
-
-    # voice recognition
-    voice_recognition_n_spent_dollars = config.models["info"]["whisper"]["price_per_1_min"] * (n_transcribed_seconds / 60)
-    if n_transcribed_seconds != 0:
-        details_text += f"- Whisper (voice recognition): <b>{voice_recognition_n_spent_dollars:.03f}$</b> / <b>{n_transcribed_seconds:.01f} seconds</b>\n"
-
-    total_n_spent_dollars += voice_recognition_n_spent_dollars
-
-
-    text = f"You spent <b>{total_n_spent_dollars:.03f}$</b>\n"
-    text += f"You used <b>{total_n_used_tokens}</b> tokens\n\n"
-    text += details_text
+    text = f"🏷️ Детали:\nИспользовано вызовов: {used_calls}\nОсталось вызовов: {exists_calls}"
 
     await update.message.reply_text(text, parse_mode=ParseMode.HTML)
 
@@ -629,7 +643,8 @@ async def edited_message_handle(update: Update, context: CallbackContext):
 
 
 async def error_handle(update: Update, context: CallbackContext) -> None:
-    print("ошибка")
+    if 'Conflict:' in str(context.error):
+        return
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
 
     try:
@@ -651,8 +666,15 @@ async def error_handle(update: Update, context: CallbackContext) -> None:
             except telegram.error.BadRequest:
                 # answer has invalid characters, so we send it without parse_mode
                 await context.bot.send_message(update.effective_chat.id, message_chunk)
+            except AttributeError:
+                pass
+    except telegram.error.Conflict:
+        pass
     except:
-        await context.bot.send_message(update.effective_chat.id, "Some error in error handler")
+        traceback.print_exc()
+        print("какая то ошибка хуй его знает")
+        # await context.bot.send_message(update.effective_chat.id, "Some error in error handler")
+
 
 async def post_init(application: Application):
     await application.bot.set_my_commands([
@@ -662,19 +684,87 @@ async def post_init(application: Application):
         BotCommand("/balance", "Show balance"),
         BotCommand("/settings", "Show settings"),
         BotCommand("/help", "Show help message"),
+        BotCommand("/shipping", "Create payment invoice"),
     ])
+
+
+async def successful_payment_callback(update: Update, context: CallbackContext):
+    invoice_uid = update.message.successful_payment.invoice_payload
+
+    exist_invoice = db.get_invoice(invoice_uid)
+    added_api_calls = exist_invoice['calls_count']
+
+    remaining_calls = db.get_user_attribute(update.message.from_user.id, 'remaining_calls')
+    remaining_calls += added_api_calls
+    db.set_user_attribute(update.message.from_user.id, 'remaining_calls', remaining_calls)
+
+    await context.bot.send_message(update.effective_chat.id, f"Оплата прошла успешно!\nДобавлено вызовов: {added_api_calls}\nСуммарное число вызовов: {remaining_calls}")
+
+
+async def start_payment_choose_tarif(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = []
+    for index, i in enumerate(config.PRICE_LIST):
+        keyboard.append([InlineKeyboardButton(i['button_label'], callback_data=f"shipping_mode_{index}")])
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    text = "Выберите тариф, который вас интересует: "
+
+    await update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+
+
+async def start_with_shipping_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    index_tarif = int(str(update.callback_query.data).replace("shipping_mode_", ""))
+
+    price_el = config.PRICE_LIST[index_tarif]
+
+    chat_id = update.callback_query.from_user.id
+    title = price_el['title']
+    description = price_el['description']
+    # select a payload just for you to recognize its the donation from your bot
+    payload = db.create_invoice(update.callback_query.from_user.id, price_el['calls_count'])
+    # In order to get a provider_token see https://core.telegram.org/bots/payments#getting-a-token
+    currency = "RUB"
+    # price in dollars
+    price = price_el['price_rub']
+
+    # check https://core.telegram.org/bots/payments#supported-currencies for more details
+    prices = [LabeledPrice(price_el['price_label'], price * 100)]
+
+    # optionally pass need_name=True, need_phone_number=True,
+    # need_email=True, need_shipping_address=True, is_flexible=True
+    await context.bot.send_invoice(
+        chat_id,
+        title,
+        description,
+        payload,
+        config.payment_token,
+        currency,
+        prices,
+        is_flexible=False,
+    )
+
+
+async def precheckout_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Answers the PreQecheckoutQuery"""
+    query = update.pre_checkout_query
+
+    user_invoices = {i["invoice_uid"]: i for i in db.get_invoices(query.from_user.id)}
+
+    # check the payload, is this from your bot?
+    if query.invoice_payload not in user_invoices:
+        # answer False pre_checkout_query
+        await query.answer(ok=False, error_message="Invoice not found...")
+        return
+
+    if user_invoices[query.invoice_payload]['created_at'] + timedelta(seconds=config.INVOICE_LIVE_TIME) > datetime.utcnow():
+        await query.answer(ok=True)
+    else:
+        await query.answer(ok=False, error_message="Срок оплаты истек! Проведите оплату заново!")
 
 
 def run_bot() -> None:
     print("залупа 0")
-    application = (
-        ApplicationBuilder()
-        .token(config.telegram_token)
-        .concurrent_updates(True)
-        .rate_limiter(AIORateLimiter(max_retries=5))
-        .post_init(post_init)
-        .build()
-    )
+    application = Application.builder().token(config.telegram_token).concurrent_updates(True).rate_limiter(AIORateLimiter(max_retries=5)).post_init(post_init).build()
 
     print("залупа 1")
 
@@ -704,6 +794,14 @@ def run_bot() -> None:
     application.add_handler(CallbackQueryHandler(set_settings_handle, pattern="^set_settings"))
 
     application.add_handler(CommandHandler("balance", show_balance_handle, filters=user_filter))
+
+    application.add_handler(
+        MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
+    )
+    application.add_handler(CommandHandler("pay", start_payment_choose_tarif, filters=user_filter))
+    application.add_handler(CallbackQueryHandler(start_with_shipping_callback, pattern="^shipping_mode"))
+
+    application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
 
     application.add_error_handler(error_handle)
 
