@@ -55,6 +55,7 @@ HELP_MESSAGE = """Команды:
 ⚪ /mode – Выбрать режим чата
 ⚪ /settings – Показать настройки
 ⚪ /balance – Показать баланс
+⚪ /pay – Пополнение баланса
 ⚪ /help – Показать панель помощи
 
 🎨 Создание изображений из текстовых подсказок в <b>👩‍🎨Художник</b> /mode
@@ -200,7 +201,7 @@ async def message_handle(update: Update, context: CallbackContext, message=None,
         return
 
     if db.get_remaining_calls(update.message.from_user.id) <= 0:
-        await update.message.reply_text('У вас на счету 0 вызовов 🥲\nВы можете купить вызовы командой /pay')
+        await update.message.reply_text('У вас на счету <b>0 вызовов</b> 🥲\nВы можете купить вызовы командой <b>/pay</b>', parse_mode=ParseMode.HTML)
         return
 
     _message = message or update.message.text
@@ -672,7 +673,7 @@ async def error_handle(update: Update, context: CallbackContext) -> None:
         pass
     except:
         traceback.print_exc()
-        print("какая то ошибка хуй его знает")
+        print("ОШИБКА")
         # await context.bot.send_message(update.effective_chat.id, "Some error in error handler")
 
 
@@ -682,9 +683,9 @@ async def post_init(application: Application):
         BotCommand("/mode", "Select chat mode"),
         BotCommand("/retry", "Re-generate response for previous query"),
         BotCommand("/balance", "Show balance"),
+        BotCommand("/pay", "Create payment invoice"),
         BotCommand("/settings", "Show settings"),
         BotCommand("/help", "Show help message"),
-        BotCommand("/shipping", "Create payment invoice"),
     ])
 
 
@@ -698,7 +699,7 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
     remaining_calls += added_api_calls
     db.set_user_attribute(update.message.from_user.id, 'remaining_calls', remaining_calls)
 
-    await context.bot.send_message(update.effective_chat.id, f"Оплата прошла успешно!\nДобавлено вызовов: {added_api_calls}\nСуммарное число вызовов: {remaining_calls}")
+    await context.bot.send_message(update.effective_chat.id, f"🤩 <b>Оплата прошла успешно!</b>\nДобавлено вызовов: <b>{added_api_calls}</b>\nСуммарное число вызовов: <b>{remaining_calls}</b>", parse_mode=ParseMode.HTML)
 
 
 async def start_payment_choose_tarif(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -707,7 +708,7 @@ async def start_payment_choose_tarif(update: Update, context: ContextTypes.DEFAU
         keyboard.append([InlineKeyboardButton(i['button_label'], callback_data=f"shipping_mode_{index}")])
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    text = "Выберите тариф, который вас интересует: "
+    text = "<b>Выберите тариф, который вас интересует: </b>"
 
     await update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
 

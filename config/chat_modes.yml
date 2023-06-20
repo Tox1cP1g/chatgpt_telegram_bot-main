@@ -15,9 +15,6 @@ code_assistant:
     Format output in Markdown.
   parse_mode: markdown
 
-artist:
-  name: 👩‍🎨 Artist
-  welcome_message: 👩‍🎨 Hi, I'm <b>Artist</b>. I'll draw anything you write me (e.g. <i>Ginger cat selfie on Times Square, illustration</i>)
 
 english_tutor:
   name: 🇬🇧 English Tutor
