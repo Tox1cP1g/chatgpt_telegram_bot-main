@@ -49,7 +49,8 @@ class Database:
             "current_model": config.models["available_text_models"][0],
 
             "n_used_tokens": {},
-
+            'remaining_calls': 0,
+            'current_calls': 0,
             "n_generated_images": 0,
             "n_transcribed_seconds": 0.0  # voice message transcription
         }
@@ -128,12 +129,44 @@ class Database:
             {"$set": {"messages": dialog_messages}}
         )
 
-    def create_invoice(self, user_id: int):
+    def create_invoice(self, user_id: int, calls_count: int):
         invoice_uuid = uuid.uuid4().hex
         self.invoices_collection.insert_one({
             "_id": invoice_uuid,
-
+            "user_id": user_id,
+            'invoice_uid': invoice_uuid,
+            'created_at': datetime.utcnow(),
+            'calls_count': calls_count
         })
 
-    def get_invoice(self, user_id: int):
-        pass
+        return invoice_uuid
+
+    def get_invoices(self, user_id: int):
+        data = self.invoices_collection.find(
+            {"user_id": user_id}
+        )
+
+        return list(data)
+
+    def get_invoice(self, invoice_uid: str):
+        data = self.invoices_collection.find(
+            {"invoice_uid": invoice_uid}
+        )
+
+        return data[0]
+
+    def get_remaining_calls(self, user_id):
+        return self.get_user_attribute(user_id, 'remaining_calls')
+
+    def update_user_calls(self, user_id):
+        current_calls = self.get_user_attribute(user_id, 'current_calls')
+        remaining_calls = self.get_user_attribute(user_id, 'remaining_calls')
+
+        self.set_user_attribute(user_id, 'current_calls', current_calls + 1)
+        self.set_user_attribute(user_id, 'remaining_calls', remaining_calls - 1)
+
+
+if __name__ == "__main__":
+    d = Database()
+    # d.get_invoices(996923064)
+    print(d.get_invoice('16a0c09b53c94151bea6c3c9479a5271'))

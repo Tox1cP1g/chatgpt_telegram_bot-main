@@ -137,3 +137,5 @@ docker-compose.dev.yml
 mongodb/
 
 .DS_Store
+
+.idea
