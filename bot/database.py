@@ -49,7 +49,7 @@ class Database:
             "current_model": config.models["available_text_models"][0],
 
             "n_used_tokens": {},
-            'remaining_calls': 0,
+            'remaining_calls': 10,
             'current_calls': 0,
             "n_generated_images": 0,
             "n_transcribed_seconds": 0.0  # voice message transcription
